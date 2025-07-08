@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    appDir: false, // 👈 Tells Next.js not to look for /src/app
+  },
 };
 
 export default nextConfig;
