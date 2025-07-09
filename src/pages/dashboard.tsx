@@ -18,6 +18,8 @@ export default function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);  
+  
 
   const filteredListings = useMemo(() => {
     return filter === 'all'
@@ -37,6 +39,7 @@ export default function Dashboard() {
       router.push('/');
     } else {
       fetchListings();
+      setIsCheckingAuth(false);
     }
   }, []);
 
@@ -60,15 +63,18 @@ export default function Dashboard() {
   }, []);
 
   const handleSave = async () => {
-    if (!selectedListing) return;
+  if (!selectedListing) return;
 
-    await fetch('/api/listings', {
+  try {
+    const updateRes = await fetch('/api/listings', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: selectedListing.id, updatedData: selectedListing }),
     });
 
-    await fetch('/api/audit', {
+    if (!updateRes.ok) throw new Error('Update failed');
+
+    const auditRes = await fetch('/api/audit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -78,10 +84,18 @@ export default function Dashboard() {
       }),
     });
 
+    if (!auditRes.ok) throw new Error('Audit logging failed');
+
     toast.success('Updated successfully');
     setSelectedListing(null);
-    fetchListings();
-  };
+    await fetchListings();   
+  } catch (error) {
+    toast.error((error as Error).message || 'Something went wrong');
+  }
+};
+   if (isCheckingAuth) {
+    return null;
+  }
 
   return (
     <div className="p-6">
