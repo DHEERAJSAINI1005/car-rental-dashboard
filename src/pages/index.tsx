@@ -1,11 +1,23 @@
 import { useRouter } from 'next/router';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useState,useEffect } from 'react';
 
 const LoginPage: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);  
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isLoggedIn = localStorage.getItem('isLoggedIn');
+      if (isLoggedIn === 'true') {
+        router.replace('/dashboard');
+      } else {
+        setIsCheckingAuth(false);
+      }
+    }
+  }, []);
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -17,7 +29,8 @@ const LoginPage: React.FC = () => {
       setErrorMsg('Invalid email or password.');
     }
   };
-
+  if (isCheckingAuth) return null;
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form

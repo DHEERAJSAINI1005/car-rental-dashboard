@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import ListingRow from './components/ListingRow';
+import toast from 'react-hot-toast';
 
 type Listing = {
   id: number;
@@ -77,7 +78,7 @@ export default function Dashboard() {
       }),
     });
 
-    alert('Listing updated successfully.');
+    toast.success('Updated successfully');
     setSelectedListing(null);
     fetchListings();
   };
